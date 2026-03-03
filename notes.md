@@ -3,7 +3,6 @@ https://github.com/QwenLM/Qwen3-TTS?tab=readme-ov-file#python-package-usage
 pyttsx3
 
 from gradio_client import Client, handle_file
-```
 # Initialize the client with the space ID or URL
 # In this case, we use a space ID "abidlabs/whisper"
 client = Client("abidlabs/whisper")
@@ -17,4 +16,3 @@ result = client.predict(
 
 print(result)
 # Expected output: "This is a test of the whisper speech recognition model."
-```

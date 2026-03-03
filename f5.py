@@ -1,4 +1,9 @@
-from f5_tts.infer import TTS
+try:
+    from f5_tts.infer import TTS
+except ImportError:
+    print("edge-tts not found. Installing...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "f5-tts"])
+    from f5_tts.infer import TTS
 languages = ["en", "zh"]
 def f5(language, text, filename):
     if language not in languages:
@@ -9,5 +14,6 @@ def f5(language, text, filename):
         reference_audio_path="reference.wav",
         reference_text="Reference audio transcript"
     )
-    audio.save(f"{filename}.wav")
-    return f"{filename}.wav"
+    filename = f"{filename}.mp3"
+    audio.save(filename)
+    return filename
