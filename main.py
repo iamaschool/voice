@@ -1,5 +1,7 @@
 from system import rate_system as rate
-libs = ["f5", "gtts", "etts", "qwen3", "sys", "gradio", "gradioapi"]
+import importlib
+import requests
+libs = ["sys", "gtts", "etts", "f5", "qwen3", "gradioapi"]
 score = rate()
 try:
     response = requests.get("https://example.com", timeout=5)
@@ -8,16 +10,32 @@ except requests.RequestException:
     wifi = False
 
 if score < 4:
-    libs.remove("f5", "qwen3", "gradio")
+    badlist = ["f5", "qwen3"]
+    for bad in badlist:
+        libs.remove(bad)
 if not wifi:
-    libs.remove("gtts", "etts", "gradioapi")
+    badlist = ["gtts", "etts", "gradioapi"]
+    for bad in badlist:
+        libs.remove(bad)
 
-def select(language, text, strain):
+def auto(language, text, strain, filename):
+    strain = round(strain/len(libs))
+    libname = libs[strain]
+    lib = getattr(importlib.import_module(libname), libname)
+    return lib(language, text, filename)
+
+def select(libname, language, text, filename, gradiopi = 'False'):
     for lib in libs:
-        import lib
+        lib = importlib.import_module(lib)
+        lang = getattr(lib, "lang")
         if language not in lang():
             libs.remove(lib)
-    strain = round(strain/len(libs))
-    lib = libs[strain]
-    from lib import lib
-    lib(language)
+    if gradiopi == 'False':
+        libs.remove('gradioapi')
+    if libname not in libs:
+        filename = auto(language, text, libs.index(libname), filename)
+    else:
+        libname = libs[libs.index(libname)]
+        lib = getattr(importlib.import_module(libname), libname)
+        filename = lib(language, text, filename)
+    return filename
