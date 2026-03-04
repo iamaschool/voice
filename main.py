@@ -1,6 +1,16 @@
 from system import rate_system as rate
 import importlib
 import requests
+import random
+import os
+import sys
+try:
+    from ftlangdetect import detect
+except ImportError:
+    print("edge-tts not found. Installing...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "fasttext-langdetect"])
+    from ftlangdetect import detect
+
 libs = ["sys", "gtts", "etts", "f5", "qwen3", "gradioapi"]
 score = rate()
 try:
@@ -38,4 +48,9 @@ def select(libname, language, text, filename, gradiopi = 'False'):
         libname = libs[libs.index(libname)]
         lib = getattr(importlib.import_module(libname), libname)
         filename = lib(language, text, filename)
-    return filename
+        name = f"{random.uniform(1, 10)}.{filename.split(".")[1]}"
+        os.rename(filename, name)
+    return name
+
+def language(text):
+    result = detect(text, low_memory=False)

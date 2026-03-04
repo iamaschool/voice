@@ -1,3 +1,5 @@
+from pathlib import Path
+ref_path = Path("./dataset/reference.wav")
 try:
     from f5_tts.infer import TTS
 except ImportError:
@@ -11,7 +13,7 @@ def f5(language, text, filename):
     tts = TTS(model_name="F5TTS_v1_Base", device="cuda")
     audio = tts.synthesize(
         text=text,
-        reference_audio_path="reference.wav",
+        reference_audio_path=ref_path,
         reference_text="Reference audio transcript"
     )
     filename = f"{filename}.mp3"
