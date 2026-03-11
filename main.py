@@ -1,9 +1,14 @@
+from pydoc import text
 from system import rate_system as rate
 import importlib
 import requests
 import random
 import os
 import sys
+from lingua import Language, LanguageDetectorBuilder
+from nltk.tokenize import sent_tokenize
+from pydub import AudioSegment
+
 try:
     from ftlangdetect import detect
 except ImportError:
@@ -28,18 +33,39 @@ if not wifi:
     for bad in badlist:
         libs.remove(bad)
 
-def auto(language, text, strain, filename):
+def auto(text, strain, filename):
+    filenames = []
     strain = round(strain/len(libs))
     libname = libs[strain]
     lib = getattr(importlib.import_module(libname), libname)
-    return lib(language, text, filename)
+    languages = detect(text)
+    for language in languages:
+        sentence, lang = language.split(":")
+        filenames.append(lib(lang, sentence, filename))
+    audio = filenames[0]
+    for filename in filenames[1:]:
+        audio += filename
+    audio.export(filename, format="mp3")
+    for filename in filenames:
+        os.remove(filename)
+    return filename
 
-def select(libname, language, text, filename, gradiopi = 'False'):
-    for lib in libs:
-        lib = importlib.import_module(lib)
-        lang = getattr(lib, "lang")
-        if language not in lang():
-            libs.remove(lib)
+def select(libname, text, filename, gradiopi = 'False'):
+    languages = detect(text)
+    i, languages = languages.split(":")
+    liblangs = []
+    for libname in libs:
+            lib = importlib.import_module(libname)
+            lang = getattr(lib, "lang")
+            liblangs.append(f"{libname}:{lang()}")
+    for l in liblangs:
+        sentence, language = language.split(":")
+        libname, lang = l.split(":")
+        for lan in lang:
+            if lan in languages:
+                pass
+        else:
+            libs.remove(libname)
     if gradiopi == 'False':
         libs.remove('gradioapi')
     if libname not in libs:
@@ -53,4 +79,13 @@ def select(libname, language, text, filename, gradiopi = 'False'):
     return name
 
 def language(text):
-    result = detect(text, low_memory=False)
+    text = sent_tokenize(text)
+    languages = [Language.ENGLISH, Language.FRENCH, Language.GERMAN, Language.SPANISH]
+    detector = LanguageDetectorBuilder.from_languages(*languages).build()
+    langtext = []
+    for i, sentence in enumerate(text):
+        if detector.detect_language_of(text) == None:
+            detector = LanguageDetectorBuilder.from_all_languages().with_preloaded_language_models().build()
+        langtext.append(f"{sentence}:{detector.detect_language_of(sentence).iso_code_639_1.name.lower()}")
+    return langtext
+
