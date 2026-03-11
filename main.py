@@ -32,7 +32,7 @@ if not wifi:
     badlist = ["gtts", "etts", "gradioapi"]
     for bad in badlist:
         libs.remove(bad)
-
+#intead of using strain strain has to narrow down the list so only the lnaguages can be picked form the numbers after the list for every language a lib closest to the tob has to be picked out that slanguage list contains the language and then use that lib to generte the text.
 def auto(text, strain, filename):
     filenames = []
     strain = round(strain/len(libs))
