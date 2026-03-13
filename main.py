@@ -34,14 +34,31 @@ if not wifi:
         libs.remove(bad)
 #intead of using strain strain has to narrow down the list so only the lnaguages can be picked form the numbers after the list for every language a lib closest to the tob has to be picked out that slanguage list contains the language and then use that lib to generte the text.
 def auto(text, strain, filename):
+    global languagetext
     filenames = []
     strain = round(strain/len(libs))
-    libname = libs[strain]
-    lib = getattr(importlib.import_module(libname), libname)
-    languages = detect(text)
-    for language in languages:
-        sentence, lang = language.split(":")
-        filenames.append(lib(lang, sentence, filename))
+    libs = libs[:strain]
+    for langtext in languagetext:
+        sentence, language = langtext.split(":")
+        for libname in libs:
+            lib = getattr(importlib.import_module(libname), libname)
+            lang = getattr(lib, "lang")
+            if language in lang():
+                filename = lib(language, sentence, filename)
+                filenames.append(filename)
+                break
+        libname = libs[0]
+        lib = getattr(importlib.import_module(libname), libname)
+        lang = getattr(lib, "lang")
+        filename = lib(language, sentence, filename)
+        filenames.append(filename)
+    #libname = libs[strain]
+    #lib = getattr(importlib.import_module(libname), libname)
+
+    #languages = detect(text)
+    #for language in languages:
+    #    sentence, lang = language.split(":")
+    #    filenames.append(lib(lang, sentence, filename))
     audio = filenames[0]
     for filename in filenames[1:]:
         audio += filename
@@ -51,8 +68,12 @@ def auto(text, strain, filename):
     return filename
 
 def select(libname, text, filename, gradiopi = 'False'):
-    languages = detect(text)
-    i, languages = languages.split(":")
+    global languagetext
+    languagetext = detect(text)
+    languages = []
+    for language in languagetext:
+        sentence, lang = language.split(":")
+        languages.append(lang)
     liblangs = []
     for libname in libs:
             lib = importlib.import_module(libname)
