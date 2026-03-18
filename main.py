@@ -4,10 +4,12 @@ import importlib
 import requests
 import random
 import os
+import rich
+import subprocess
 import sys
 from lingua import Language, LanguageDetectorBuilder
 from nltk.tokenize import sent_tokenize
-from pydub import AudioSegment
+from moviepy import AudioFileClip, concatenate_audioclips
 
 try:
     from ftlangdetect import detect
@@ -16,7 +18,7 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "fasttext-langdetect"])
     from ftlangdetect import detect
 
-libs = ["sys", "gtts", "etts", "f5", "qwen3", "gradioapi"]
+libs = ["sysvc", "gtts", "etts", "f5", "qwen3", "gradioapi"]
 score = rate()
 try:
     response = requests.get("https://example.com", timeout=5)
@@ -34,7 +36,7 @@ if not wifi:
         libs.remove(bad)
 #intead of using strain strain has to narrow down the list so only the lnaguages can be picked form the numbers after the list for every language a lib closest to the tob has to be picked out that slanguage list contains the language and then use that lib to generte the text.
 def auto(text, strain, filename):
-    global languagetext
+    global languagetext, libs
     filenames = []
     strain = round(strain/len(libs))
     libs = libs[:strain]
@@ -50,8 +52,8 @@ def auto(text, strain, filename):
         libname = libs[0]
         lib = getattr(importlib.import_module(libname), libname)
         lang = getattr(lib, "lang")
-        filename = lib(language, sentence, filename)
-        filenames.append(filename)
+        filename1 = lib(language, sentence, filename)
+        filenames.append(filename1)
     #libname = libs[strain]
     #lib = getattr(importlib.import_module(libname), libname)
 
@@ -59,20 +61,18 @@ def auto(text, strain, filename):
     #for language in languages:
     #    sentence, lang = language.split(":")
     #    filenames.append(lib(lang, sentence, filename))
-    audio = filenames[0]
-    for filename in filenames[1:]:
-        audio += filename
-    audio.export(filename, format="mp3")
-    for filename in filenames:
-        os.remove(filename)
+    audio = concatenate_audioclips([AudioFileClip(f) for f in filenames])
+    audio.write_audiofile(filename, verbose=False)
+    for filename2 in filenames:
+        os.remove(filename2)
     return filename
 
 def select(text, filename, gradiopi = 'False', libname = None):
     global languagetext
     languagetext = detect(text)
     languages = []
-    for language in languagetext:
-        sentence, lang = language.split(":")
+    for lang_item in languagetext:
+        sentence, lang = lang_item.split(":")
         languages.append(lang)
     liblangs = []
     for libname in libs:
@@ -99,14 +99,15 @@ def select(text, filename, gradiopi = 'False', libname = None):
         os.rename(filename, name)
     return name
 
-def language(text):
+def detect(text):
     text = sent_tokenize(text)
     languages = [Language.ENGLISH, Language.FRENCH, Language.GERMAN, Language.SPANISH]
     detector = LanguageDetectorBuilder.from_languages(*languages).build()
     langtext = []
     for i, sentence in enumerate(text):
-        if detector.detect_language_of(text) == None:
+        if detector.detect_language_of(sentence) == None:
             detector = LanguageDetectorBuilder.from_all_languages().with_preloaded_language_models().build()
         langtext.append(f"{sentence}:{detector.detect_language_of(sentence).iso_code_639_1.name.lower()}")
     return langtext
 
+print(select("Hello, how are you?", "output.mp3"))

@@ -1,5 +1,6 @@
 from pathlib import Path
-import sub
+import subprocess
+import sys
 ref_path = Path("./dataset/reference.wav")
 languages = ["en", "zh"]
 def lang():

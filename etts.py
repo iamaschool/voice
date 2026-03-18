@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+import sys
 
 # Map short language codes to Edge voices
 languages = {
@@ -37,10 +38,10 @@ async def edge_tts_generate(language, text, filename):
     if language not in languages:
         raise ValueError(
             f"Unsupported language: {language}. "
-            f"Supported languages are: {', '.join(LANGUAGE_VOICES.keys())}"
+            f"Supported languages are: {', '.join(languages.keys())}"
         )
 
-    voice = LANGUAGE_VOICES[language]
+    voice = languages[language]
     file_name = f"{filename}.mp3"
 
     communicate = edge_tts.Communicate(text, voice)
