@@ -1,2 +1,4 @@
-[Moanin'](https://www.youtube.com/watch?v=fsJ3JjpZyoA)
-[Night In Tunisia](https://www.youtube.com/watch?v=4RaR210hglo)
+- [Moanin'](https://www.youtube.com/watch?v=fsJ3JjpZyoA)
+- [Night In Tunisia](https://www.youtube.com/watch?v=4RaR210hglo)
+- [Take Five](https://www.youtube.com/watch?v=ryA6eHZNnXY)
+- [Blue Train](https://www.youtube.com/watch?v=HT_Zs5FKDZE)

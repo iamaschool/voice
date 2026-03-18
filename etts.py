@@ -1,10 +1,5 @@
 import asyncio
-try:
-    import edge_tts
-except ImportError:
-    print("edge-tts not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "edge-tts"])
-    import edge_tts
+import subprocess
 
 # Map short language codes to Edge voices
 languages = {
@@ -33,6 +28,12 @@ def lang():
     return languages
 
 async def edge_tts_generate(language, text, filename):
+    try:
+        import edge_tts
+    except ImportError:
+        print("edge-tts not found. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "edge-tts"])
+        import edge_tts
     if language not in languages:
         raise ValueError(
             f"Unsupported language: {language}. "

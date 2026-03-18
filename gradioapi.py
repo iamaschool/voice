@@ -3,19 +3,19 @@ import subprocess
 from pathlib import Path
 ref_path = Path("./dataset/reference.wav")
 
-try:
-    from gradio_client import Client, handle_file
-except ImportError:
-    print("gradio_client not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "gradio_client"])
-    from gradio_client import Client, handle_file
-
 languages = ["en"]
 
 def lang():
     return languages
 
 def gradioapi(language, text, filename, url):
+    try:
+        from gradio_client import Client, handle_file
+    except ImportError:
+        print("gradio_client not found. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "gradio_client"])
+        from gradio_client import Client, handle_file
+
     if language not in languages:
         raise ValueError(f"Unsupported language: {language}. Supported languages are: {', '.join(languages)}")
     client = Client(url)

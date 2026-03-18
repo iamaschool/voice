@@ -67,7 +67,7 @@ def auto(text, strain, filename):
         os.remove(filename)
     return filename
 
-def select(libname, text, filename, gradiopi = 'False'):
+def select(text, filename, gradiopi = 'False', libname = None):
     global languagetext
     languagetext = detect(text)
     languages = []
