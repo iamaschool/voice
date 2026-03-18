@@ -12,5 +12,5 @@ languages = [voice.languages[0].decode('utf-8') for voice in voices]
 def lang():
     return languages
 def sysvc(language, text, filename):
-    filename = "gg.mp3"
+    file_name = "gg.mp3"
     return f"{file_name}"
